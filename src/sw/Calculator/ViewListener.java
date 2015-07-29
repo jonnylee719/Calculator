@@ -5,14 +5,12 @@
  */
 package sw.Calculator;
 
+import javax.swing.JButton;
+
 /**
  *
  * @author Jonathan
  */
-public class Main {
-    public static void main(String[] args){
-        CalController_modified Calc;
-        Calc = new CalController_modified();
-        
-    }
+public interface ViewListener {
+    public void numButPressed(JButton b);
 }

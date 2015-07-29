@@ -7,11 +7,13 @@ package sw.Calculator;
 
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -33,6 +35,10 @@ public class CalView {
     JButton but8;
     JButton but9;
     
+    //All numBut
+    private JButton numBut;
+    JPanel numPanel;
+    
     JButton butAdd;
     JButton butSubt;
     JButton butMult;
@@ -45,11 +51,22 @@ public class CalView {
     JPanel background;
     JPanel buttonPanel;
     
+    ViewListener listen;
+    CalController control;
+    CalController_modified control_m;
+    
     public CalView(){
         buildGUI();
     }
     
     public void buildGUI(){
+        try{
+            setUIFont(new javax.swing.plaf.FontUIResource("Sans Serif", Font.BOLD, 30));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        
         frame = new JFrame();
         background = new JPanel();
         buttonPanel = new JPanel();
@@ -92,19 +109,70 @@ public class CalView {
         
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
         background.add(display);
-        background.add(buttonPanel);
+        //background.add(buttonPanel);
+        setNumBut();
+        background.add(numPanel);
         
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000, 1500);
         frame.add(background);
         frame.setVisible(true);
+    }
+    
+    public void setNumBut(){
+        String numString = "789456123 0 ";
+        numPanel = new JPanel();
+        numPanel.setLayout(new GridLayout(5, 3, 2, 2));
+        for(int i = 0; i < numString.length(); i++){
+            String butTop = numString.substring(i, i+1);
+            JButton numBut = new JButton(butTop);
+            if(butTop.equals(" ")){
+                numBut.setEnabled(false);
+            }
+            else
+                numBut.addActionListener(new numActionListener());
+            numPanel.add(numBut);
+        }
+    }
+    
+    private class numActionListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            JButton source = (JButton) e.getSource();
+            listen.numButPressed(source);
+        }
+    }
+    
+    public void attach(ViewListener vl){
+        this.listen = vl;
+    }
+    
+    public CalView getCurrentView(){
+        return this;
+    }
+    
+    public JTextArea getDisplay(){
+        return display;
+    }
+    
+    public void addTextD(String s){
+        display.append(s);
+    }
+    
+    public void setDisplay(String s){
+        display.setText(s);
+    }
+    
+    public String getKeyTop(JButton b){
+        return b.getText();
     }
     public static void setUIFont(javax.swing.plaf.FontUIResource f){   
         java.util.Enumeration keys = UIManager.getDefaults().keys();
         while(keys.hasMoreElements()){
             Object key = keys.nextElement();
+            System.out.println(key);
             Object value = UIManager.get(key);
-            if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);
+            if(value instanceof javax.swing.plaf.FontUIResource) 
+                UIManager.put(key, f);
         }
     }
 }

@@ -28,6 +28,12 @@ public class CalController {
     private CalModel model;
     private CalView view;
     
+    //States that the controller can be in:
+    //0 = no number entered yet
+    //1 = num1 entered
+    //2 = num2 entered
+    private int calState = 0;
+    
     //Constructor
     public CalController(){
         model = new CalModel();
@@ -35,6 +41,46 @@ public class CalController {
         display = view.display;
         display.setText(model.getTotal());
         addAllListeners();
+    }
+    
+    public void setUpViewListener(){
+        view.attach(new ViewListener() {
+
+            @Override
+            public void numButPressed(CalView view) {
+                numButAction();
+            }
+        });
+    }
+    
+    public void numButAction(){
+        if(calState == 0){
+            calState = 1;
+            num1 = view.getKeyTop();
+            view.setDisplay(num1);
+        }
+        else if (calState == 1){ 
+            if(num1.equals("0")){         //the first number is 0, so cannot append to num1
+                num1 = view.getKeyTop(); 
+                view.setDisplay(num1);
+            }
+            else{
+                String crtKey = view.getKeyTop();
+                num1 = num1 + crtKey;
+                view.addTextD(crtKey);
+            }
+        }
+        else {                            //if calState == 2
+            if(num2.equals("0")){         //num2 is currently 0, so cannot append to num1
+                num2 = view.getKeyTop(); 
+                view.setDisplay(num2);
+            }
+            else{
+                String crtKey = view.getKeyTop();
+                num2 = num2 + crtKey;
+                view.addTextD(crtKey);
+            }
+        }
     }
     
     public void addAllListeners(){
