@@ -13,4 +13,6 @@ import javax.swing.JButton;
  */
 public interface ViewListener {
     public void numButPressed(JButton b);
+    public void operButPressed(JButton b);
+    public void clearButPressed(JButton b);
 }

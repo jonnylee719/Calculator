@@ -23,37 +23,23 @@ import javax.swing.UIManager;
  * @author Jonathan
  */
 public class CalView {
-    JTextArea display;
-    JButton but0;
-    JButton but1;
-    JButton but2;
-    JButton but3;
-    JButton but4;
-    JButton but5;
-    JButton but6;
-    JButton but7;
-    JButton but8;
-    JButton but9;
+    private JTextArea display;
     
     //All numBut
     private JButton numBut;
-    JPanel numPanel;
+    private JPanel numPanel;
     
-    JButton butAdd;
-    JButton butSubt;
-    JButton butMult;
-    JButton butDivi;
+    //All OperaBut
+    private JButton operBut;
+    private JPanel operPanel;
     
-    JButton butEqual;
     JButton butCancel;
     
-    JFrame frame;
-    JPanel background;
-    JPanel buttonPanel;
+    private JFrame frame;
+    private JPanel background;
+    private JPanel buttonPanel;
     
     ViewListener listen;
-    CalController control;
-    CalController_modified control_m;
     
     public CalView(){
         buildGUI();
@@ -67,59 +53,26 @@ public class CalView {
             e.printStackTrace();
         }
         
-        frame = new JFrame();
+        frame = new JFrame("Calculator App");
         background = new JPanel();
         buttonPanel = new JPanel();
-        
-        but0 = new JButton("0");
-        but1 = new JButton("1");
-        but2 = new JButton("2");
-        but3 = new JButton("3");
-        but4 = new JButton("4");
-        but5 = new JButton("5");
-        but6 = new JButton("6");
-        but7 = new JButton("7");
-        but8 = new JButton("8");
-        but9 = new JButton("9");
-        butAdd = new JButton("+");
-        butSubt = new JButton("-");
-        butMult = new JButton("*");
-        butDivi = new JButton("/");
-        butEqual = new JButton("=");
-        butCancel = new JButton("CE");
         display = new JTextArea();
         
-        buttonPanel.setLayout(new GridLayout(0,5));
-        buttonPanel.add(but0);
-        buttonPanel.add(but1);
-        buttonPanel.add(but2);
-        buttonPanel.add(but3);
-        buttonPanel.add(but4);
-        buttonPanel.add(but5);
-        buttonPanel.add(but6);
-        buttonPanel.add(but7);
-        buttonPanel.add(but8);
-        buttonPanel.add(but9);
-        buttonPanel.add(butAdd);
-        buttonPanel.add(butSubt);
-        buttonPanel.add(butMult);
-        buttonPanel.add(butDivi);
-        buttonPanel.add(butEqual);
-        buttonPanel.add(butCancel);
+        buttonPanel.add(setNumPanel());
+        buttonPanel.add(setOperPanel());
         
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
         background.add(display);
-        //background.add(buttonPanel);
-        setNumBut();
-        background.add(numPanel);
+        background.add(buttonPanel);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 1500);
+        frame.setSize(600, 1000);
+        frame.setLocation(1200, 0);
         frame.add(background);
         frame.setVisible(true);
     }
     
-    public void setNumBut(){
+    public JPanel setNumPanel(){
         String numString = "789456123 0 ";
         numPanel = new JPanel();
         numPanel.setLayout(new GridLayout(5, 3, 2, 2));
@@ -133,12 +86,34 @@ public class CalView {
                 numBut.addActionListener(new numActionListener());
             numPanel.add(numBut);
         }
+        return numPanel;
     }
     
     private class numActionListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             JButton source = (JButton) e.getSource();
             listen.numButPressed(source);
+        }
+    }
+    
+    public JPanel setOperPanel(){
+        operPanel = new JPanel();
+        operPanel.setLayout(new GridLayout(5, 1, 2, 2));
+        String operString = "+-*/=";
+        for(int i = 0; i< operString.length(); i++){
+            String keyTop = operString.substring(i, i+1);
+            operBut = new JButton(keyTop);
+            operBut.addActionListener(new operActionListener());
+            operPanel.add(operBut);
+        }
+        return operPanel;
+    }
+    
+    private class operActionListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton source = (JButton) e.getSource();
+            listen.operButPressed(source);
         }
     }
     
@@ -169,7 +144,6 @@ public class CalView {
         java.util.Enumeration keys = UIManager.getDefaults().keys();
         while(keys.hasMoreElements()){
             Object key = keys.nextElement();
-            System.out.println(key);
             Object value = UIManager.get(key);
             if(value instanceof javax.swing.plaf.FontUIResource) 
                 UIManager.put(key, f);
