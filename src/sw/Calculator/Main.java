@@ -11,8 +11,8 @@ package sw.Calculator;
  */
 public class Main {
     public static void main(String[] args){
-        CalController_modified Calc;
-        Calc = new CalController_modified();
+        CalController Calc;
+        Calc = new CalController();
         
     }
 }

@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -33,15 +34,17 @@ public class CalView {
     private JButton operBut;
     private JPanel operPanel;
     
-    JButton butCancel;
+    private JButton butCancel;
     
     private JFrame frame;
     private JPanel background;
     private JPanel buttonPanel;
     
-    ViewListener listen;
+    private ViewListener listen;
+    private KeybController keyControl;
     
     public CalView(){
+        keyControl = new KeybController();
         buildGUI();
     }
     
@@ -57,6 +60,7 @@ public class CalView {
         background = new JPanel();
         buttonPanel = new JPanel();
         display = new JTextArea();
+        display.setEditable(false);
         
         buttonPanel.add(setNumPanel());
         buttonPanel.add(setOperPanel());
@@ -64,6 +68,7 @@ public class CalView {
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
         background.add(display);
         background.add(buttonPanel);
+        background.add(setCanPanel());
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 1000);
@@ -74,11 +79,13 @@ public class CalView {
     
     public JPanel setNumPanel(){
         String numString = "789456123 0 ";
+        int[] keyArray = {55, 56, 57, 52, 53, 54, 49, 50, 51, 255, 48, 255};
         numPanel = new JPanel();
         numPanel.setLayout(new GridLayout(5, 3, 2, 2));
         for(int i = 0; i < numString.length(); i++){
             String butTop = numString.substring(i, i+1);
-            JButton numBut = new JButton(butTop);
+            JButton numBut = new JButton();
+            keyControl.addAction(numBut, butTop, butTop, keyArray[i]);
             if(butTop.equals(" ")){
                 numBut.setEnabled(false);
             }
@@ -114,6 +121,22 @@ public class CalView {
         public void actionPerformed(ActionEvent e) {
             JButton source = (JButton) e.getSource();
             listen.operButPressed(source);
+        }
+    }
+    
+    public JPanel setCanPanel(){
+        JPanel canPanel = new JPanel();
+        butCancel = new JButton("Clear");
+        butCancel.addActionListener(new canActionListener());
+        canPanel.add(butCancel);
+        return canPanel;
+    }
+    
+    private class canActionListener implements ActionListener{
+        @Override 
+        public void actionPerformed(ActionEvent e){
+            JButton source = (JButton) e.getSource();
+            listen.clearButPressed(source);
         }
     }
     
