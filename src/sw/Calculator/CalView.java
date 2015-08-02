@@ -10,13 +10,18 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 /**
@@ -70,6 +75,12 @@ public class CalView {
         background.add(buttonPanel);
         background.add(setCanPanel());
         
+        frame.addWindowFocusListener(new WindowAdapter() {
+         public void windowGainedFocus(WindowEvent e) {
+        background.requestFocusInWindow();
+        }
+        });
+        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 1000);
         frame.setLocation(1200, 0);
@@ -91,9 +102,17 @@ public class CalView {
             }
             else
                 numBut.addActionListener(new numActionListener());
+            setUpNumKeyboard(numBut, numString.charAt(i));
             numPanel.add(numBut);
         }
         return numPanel;
+    }
+    
+    public void setUpNumKeyboard(JComponent c, char k){
+        String name = (KeyStroke.getKeyStroke(k)).toString();
+        numButAction action = new numButAction(name);
+        c.getInputMap(c.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(k), name);
+        c.getActionMap().put(name, action);
     }
     
     private class numActionListener implements ActionListener{
@@ -111,17 +130,42 @@ public class CalView {
             String keyTop = operString.substring(i, i+1);
             operBut = new JButton(keyTop);
             operBut.addActionListener(new operActionListener());
+            setUpOperKeyboard(operBut, operString.charAt(i));
             operPanel.add(operBut);
         }
         return operPanel;
     }
     
+    public void setUpOperKeyboard(JButton c, char k){
+        class operButAction extends AbstractAction{
+        public operButAction(String s){
+            super(s);
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            //System.out.println("actionPerformed in Action class");
+            JButton source = (JButton) ae.getSource();
+            ActionListener[] aListener = source.getActionListeners();
+            aListener[0].actionPerformed(ae);
+        }
+        
+        }
+        
+        String name = (KeyStroke.getKeyStroke(k)).toString();
+        operButAction action = new operButAction(name);
+        c.getInputMap(c.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(k), name);
+        c.getActionMap().put(name, action);
+    }
+    
     private class operActionListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
+//            System.out.print("got to actionPerformed in operActionListener");
             JButton source = (JButton) e.getSource();
             listen.operButPressed(source);
         }
+        
     }
     
     public JPanel setCanPanel(){
@@ -172,4 +216,19 @@ public class CalView {
                 UIManager.put(key, f);
         }
     }
+    
+    class numButAction extends AbstractAction{
+        public numButAction(String s){
+            super(s);
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            JButton source = (JButton) ae.getSource();
+            ActionListener[] aListener = source.getActionListeners();
+            aListener[0].actionPerformed(ae);
+        }
+        
+    }
+    
 }
